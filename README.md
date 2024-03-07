@@ -10,8 +10,8 @@ with the seurat package.
 ## Installation
 
 ```
-download.file('https://www.dropbox.com/s/up92p4k7hew6vl7/scR_0.9.tar.gz?dl=1', destfile = tempfile(), method = "wget")
-install.packages(paste0(tempfile(),"/scR_0.9.tar.gz"), repos = NULL, type = "source")
+download.file('https://github.com/frac2738/scR/archive/refs/heads/main.zip', destfile = tempfile(), method = "wget")
+install.packages(paste0(tempfile(),"/scR_0.9.8.tar.gz"), repos = NULL, type = "source")
 library(scR)
 ```
 
