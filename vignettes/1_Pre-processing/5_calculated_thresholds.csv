@@ -1,0 +1,2 @@
+SampleID,MT_max,MT_min,Genes_max_log10,Genes_min_log10,UMI_max_log10,unfiltered_cells,filtered_cells,removed_cells
+C1,8.742,0,2.957,1.558,3.251,11518,9295,2223

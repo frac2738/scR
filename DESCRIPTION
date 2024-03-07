@@ -1,0 +1,18 @@
+Package: scR
+Title: A collection of functions for the analysis of single-cell datasets.
+Version: 0.9.8.1
+Authors@R: 
+    person("Francesco", "Carbone", , "francesco.carbone@institutimagine.org", role = c("aut", "cre"))
+Description: A collection of functions for the analysis of single-cell datasets.
+License: GPL3
+Encoding: UTF-8
+RoxygenNote: 7.3.1
+LazyLoad: yes
+LazyData: true
+Language: en-GB
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)

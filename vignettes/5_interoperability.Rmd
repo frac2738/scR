@@ -1,0 +1,30 @@
+---
+title: "5. Interoperability"
+author: "Francesco Carbone"
+date: Last change 02-01-2023 (rebuilt `r format(Sys.time(), '%b %Y')`)
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+---
+
+```{r echo=TRUE, eval=TRUE}
+suppressPackageStartupMessages(library(scR))
+suppressPackageStartupMessages(library(Matrix))
+suppressPackageStartupMessages(library(reticulate))
+```
+
+# Export seurat object to a directory (seurat_export)
+
+```{r echo=TRUE, eval=FALSE}
+export_seurat(exp_Integrated)
+```
+
+# Load the directory in scanpy
+
+```{python echo=TRUE, eval=FALSE}
+import anndata
+
+adata <- import_from_seurat("./seurat_export")
+```

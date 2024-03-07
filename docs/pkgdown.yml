@@ -1,0 +1,13 @@
+pandoc: 3.1.1
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  1_Pre-processing: 1_Pre-processing.html
+  2_integration: 2_integration.html
+  3_annotation: 3_annotation.html
+  4_visualisation: 4_visualisation.html
+  5_interoperability: 5_interoperability.html
+  6_DEG: 6_DEG.html
+  7_Atlas: 7_Atlas.html
+last_built: 2024-03-06T10:59Z
+

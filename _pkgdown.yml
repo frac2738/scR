@@ -1,0 +1,120 @@
+template:
+  bootswatch: spacelab
+    
+navbar:
+#  title: ~
+#  type: default
+#  left:
+#    - text: Functions and data
+#      href: reference/index.html
+#    - text: Articles
+#      menu:
+#      - text: 01_integration
+#        href: articles/01_integration.html
+#      - text: 02_annotation
+#        href: articles/02_annotation.html
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search]
+   
+home:
+  sidebar:
+    structure: [ citation, license, authors]
+
+reference:
+  - title: Seurat functions (scRNA-Seq)
+    desc: Functions using the seurat package
+    contents:
+      - estimate_ambient_rna
+      - run_doubletFinder
+      - calculate_filtering_param
+      - load_10x_gem
+      - run_qc_and_filtering
+      - run_seurat_integration
+      - run_seurat_integration_v5
+      - run_integration_with_Ref
+      - transfer_annotation
+      - get_loupe_files
+      - add_adt_assay
+      - add_vdj_assay
+      - CellCycleScoring_extra
+      - calculate_mito_ribo
+      - calculate_cell_complexity
+      - compare_qc
+      
+  - title: Annotation functions
+    desc: Functions to annotate a dataset
+    contents:
+      - plot_cell_signature
+      - plot_cells_markers
+      - scType_pipeline
+    
+  - title: ArchR functions (scATAC-Seq)
+    desc:  Collection of functions to interact with ArchR projects
+    contents:
+      - archR_subset_by_sample
+      
+  - title: VDJ functions (scVDJ-Seq)
+    desc: Collection of functions for TCR/BCR analysis
+    contents:
+      - bcr_lineage_reconstruction
+    
+  - title: Enrichment analysis
+    desc:  Useful functions for enrichment analysis (ORA + GSEA)
+    contents:
+      - enrichR_analysis
+      - plot_enrichR_result
+      - fgsea_rank_genes
+    
+  - title: Visualisation functions
+    desc: Mix of visualisation functions
+    contents:
+      - VlnPlot_modified
+      - Clustered_DotPlot_nl
+      - calculate_cell_proportions
+      - stemnet_plot
+      
+  - title: Single-cell utilities
+    desc:  Useful functions for the analysis of **single-cell** dataset
+    contents:
+      - calculate_genes_signature
+    
+  - title: Interoperability with external tools
+    desc:  Useful functions that allow the interaction with external tools (e.g. scanpy)
+    contents:
+      - export_seurat
+      
+  - title: Bulk utilities
+    desc: Useful functions for the analysis of **bulk** dataset
+    contents:
+      - PCA_genes
+ 
+  - title: General utilities
+    desc:  Mix of functionalities
+    contents:
+      - convert_ensemble_to_symbol
+      - mouse_human_gene_conversion
+      - SaveFigure
+      - Middle_Number
+      - setup_sc_project
+
+  - title: Datsets
+    desc: data used by the internal functions (mainly)
+    contents:
+      - ABIS_markers
+      - pbmc_markers
+      - pbmc_markers_annotated
+      - pbmc_1k
+      - MouseHumanGenes
+      - ScTypeDB
+      
+  - title: Internal
+    desc: Internal functions
+    contents:
+      - Parser
+      - validate_markers
+      - parse_input
+      - parse_markers_lists
+      - markers_lookup
+      - modify_scales
+
