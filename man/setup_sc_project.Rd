@@ -20,8 +20,25 @@ Create reproducible project directory organization when initiating a new analysi
 \examples{
 \dontrun{
 # If using built-in directory structure.
-setup_sc_project("/home/project","new_project")
+
+project_dir <- "/home/projects"
+projectID <- "new_project"
+
+setup_sc_project(project_dir, projectID)
 }
+This will create a folder with the following structure
+
+new_project
+|--- 01_metadata 
+|--- 02_raw_data
+|--- 03_processed_data
+  |--- cellranger_summaries
+  |--- cloupe_files
+  |--- Samples_QC
+|--- 04_additional_data
+|--- 05_scripts
+|--- 06_reports
+|--- analysis
 
 }
 \concept{organization_util}

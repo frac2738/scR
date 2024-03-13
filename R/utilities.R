@@ -21,7 +21,7 @@
 #' # If using built-in directory structure.
 #' 
 #' project_dir <- "/home/projects"
-#' projectID <- "new_project
+#' projectID <- "new_project"
 #' 
 #' setup_sc_project(project_dir, projectID)
 #' }
