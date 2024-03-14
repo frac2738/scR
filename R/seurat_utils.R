@@ -210,7 +210,8 @@ estimate_ambient_rna <- function(sampleid, raw_dataDIR, estGenes = NULL, counts2
    library(SoupX)
    library(DropletUtils)
    
-   message(paste0("Processing ",sampleid))
+   message(paste0("** Processing ",sampleid))
+   message(paste0("   Reading data from: ",raw_dataDIR,"/",sampleid))
    
    sc <- load10X(paste0(raw_dataDIR,"/",sampleid))
    sc$metaData$clusters <- as.character(sc$metaData$clusters)
@@ -221,13 +222,16 @@ estimate_ambient_rna <- function(sampleid, raw_dataDIR, estGenes = NULL, counts2
    } else {
       useToEst <- estimateNonExpressingCells(sc, nonExpressedGeneList = list(EST = estGenes))
       
-      if(length(unique(useToEst))>1){
+      if(length(unique(useToEst[,1]))>1){
          sc <- calculateContaminationFraction(sc, list(EST = estGenes), useToEst = useToEst)
       } else {
          sc <- autoEstCont(sc)
       }
       
    }
+   
+   plotMarkerMap(sc, geneSet = estGenes, useToEst = useToEst)
+   
    
    corrected_mtx <- adjustCounts(sc)
    
@@ -505,7 +509,7 @@ run_doubletFinder <- function(srtObject, meta_column = "seurat_clusters", isSCT 
       tmp_data <- srtObject
    }
    
-   sweep.res.list <- paramSweep_v3(tmp_data, PCs = 1:30, sct = isSCT)
+   sweep.res.list <- paramSweep(tmp_data, PCs = 1:30, sct = isSCT)
    sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)
    bcmvn <- find.pK(sweep.stats)
    
@@ -514,7 +518,7 @@ run_doubletFinder <- function(srtObject, meta_column = "seurat_clusters", isSCT 
    nExp_poi <- round(0.075*nrow(tmp_data@meta.data))     ## Assuming 7.5% doublet formation rate - tailor for your dataset
    nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
    
-   tmp_data <- doubletFinder_v3(tmp_data, PCs = 1:30, pN = 0.25, pK = 0.09, nExp = nExp_poi, reuse.pANN = FALSE, sct = isSCT)
+   tmp_data <- doubletFinder(tmp_data, PCs = 1:30, pN = 0.25, pK = 0.09, nExp = nExp_poi, reuse.pANN = FALSE, sct = isSCT)
 
    return(tmp_data)
    
