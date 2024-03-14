@@ -68,19 +68,24 @@ run_qc_and_filtering <- function(exp_meta,sample_num,pipeline, minFeatures, pcDi
    if(remove_doublets){
       
       cli_inform(message = " Setting seurat v5 to FALSE")
-      options(Seurat.object.assay.version = "v3")
+      options(Seurat.object.assay.version = "v5")
       doublets <- run_doubletFinder(raw_st, meta_column = "seurat_clusters", isSCT = FALSE, countMatrix = TRUE, seurat5 = FALSE)
       colnames(doublets@meta.data)[ncol(doublets@meta.data)] <- "isDoublet"
          
-      Idents(doublets) <- "isDoublet"
+      #Idents(doublets) <- "isDoublet"
       colorini <- c("#FDE725FF","#440154FF")
-      names(colorini) <- c("Doublets","Singlet")
+      names(colorini) <- c("Singlet","Doublet")
       
-      p0 <- DimPlot(doublets, order = TRUE, cols = colorini)
+      p0 <- DimPlot(doublets, group.by = "isDoublet", order = TRUE, cols = colorini)
       ggsave(p0, filename = paste0(qc_dir,"/",sample_name,"_doublets.png"), width = 12, height = 9)
       
       doublets <- subset(doublets, idents = "Singlet", invert = FALSE)
-      raw_st <- doublets@assays$RNA@counts
+      if(seurat5){
+         raw_st <- doublets@assays$RNA@layers$counts
+      } else {
+         raw_st <- doublets@assays$RNA@counts
+         
+      }
       
       write.csv(data.frame(singlets_umi = ncol(raw_st), singlets_genes = nrow(raw_st)), 
                 file = paste0(qc_dir,"/",sample_name,"_singlets_cells.csv"), row.names = FALSE)
@@ -251,10 +256,16 @@ run_seurat_integration_v5 <- function(dataDIR, samples_vect = NULL, intMethod, o
    } 
    
    sample_list <- c()
-   metadata_list <- data.frame(matrix(ncol = 10, nrow = 0))
-   names(metadata_list) <- c("orig.ident","nCount_RNA","nFeature_RNA","percent.mt",
-                             "percent.ribo","log10GenesPerUMI","SampleID","source",
-                             "RNA_snn_res.0.8","seurat_clusters")
+   metadata_list <- data.frame(matrix(ncol = 9, nrow = 0))
+   
+   if(isSCT){
+      colonnine <- c("nCount_SCT","nFeature_SCT")
+   } else {
+      colonnine <- c("nCount_RNA","nFeature_RNA")
+   }
+   
+   names(metadata_list) <- c("orig.ident",colonnine, "percent.mt","percent.ribo",
+                             "log10GenesPerUMI","SampleID","source","seurat_clusters")
    
    for(srt_object in samples_vect){
       
@@ -270,10 +281,12 @@ run_seurat_integration_v5 <- function(dataDIR, samples_vect = NULL, intMethod, o
       rds_file <- paste0(dataDIR,"/",rds_file)
       mySample <- readRDS(rds_file)
       
-      # remove celline columns      
-      if(length(grep("K562|K562_kNN", names(mySample@meta.data))) >0){
-         mySample@meta.data <- mySample@meta.data[,names(metadata_list)]
-      }
+      # # remove celline columns      
+      # if(length(grep("K562|K562_kNN", names(mySample@meta.data))) >0){
+      #    mySample@meta.data <- mySample@meta.data[,names(metadata_list)]
+      # }
+      
+      mySample@meta.data <- mySample@meta.data[,names(metadata_list)]
       
       metadata_list <- rbind(metadata_list,mySample@meta.data)
       sample_list[[sample_name]] <- mySample@assays$RNA$counts
