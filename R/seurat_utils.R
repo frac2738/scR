@@ -220,7 +220,7 @@ estimate_ambient_rna <- function(sampleid, raw_dataDIR, estGenes = NULL, counts2
       sc <- autoEstCont(sc)
       
    } else {
-      useToEst <- estimateNonExpressingCells(sc, nonExpressedGeneList = list(EST = estGenes))
+      useToEst <- estimateNonExpressingCells(sc, nonExpressedGeneList = list(EST = estGenes), clusters=FALSE)
       
       if(length(unique(useToEst[,1]))>1){
          sc <- calculateContaminationFraction(sc, list(EST = estGenes), useToEst = useToEst)
@@ -228,10 +228,14 @@ estimate_ambient_rna <- function(sampleid, raw_dataDIR, estGenes = NULL, counts2
          sc <- autoEstCont(sc)
       }
       
+      for(genietto in estGenes){
+         
+         tmp_plot <- plotMarkerMap(sc, genietto)
+         tmp_plot <- tmp_plot + ggtitle(genietto)
+         ggplot2::ggsave(tmp_plot, filename=paste0("./",sampleid,"_contamination_",genietto,".png"), dpi = 300, width = 14,height = 9)
+      
+      }
    }
-   
-   plotMarkerMap(sc, geneSet = estGenes, useToEst = useToEst)
-   
    
    corrected_mtx <- adjustCounts(sc)
    
@@ -604,63 +608,57 @@ transfer_annotation <- function(referece_obj, query_obj, pipeline, annotation_co
 #' \dontrun{get_loupe_files()}
 get_loupe_files <- function(srtObject,cellranger_cells,meta_cols, outDIR = NULL){
    
+   message("[Function deprecated] Please use the official library from 10: loupeR")
+   
    # v.1.0
    # srtObject = Seurat object.size
    # cellranger_cells = List of cells in the loupe file
    # meta_cols = columns from srtObject@meta.data to include in the metadata file
    
-   umapCoordinates <- as.data.frame(Embeddings(object = srtObject, reduction = "umap"))
-   samples <- unique(srtObject@meta.data$SampleID)
-   
-   coordinate_fixed <- data.frame()
-   for(idx in 1:length(samples)){
-      
-      tmp_table <- umapCoordinates[grep(samples[idx],rownames(umapCoordinates)),]
-      tmp_table$Barcode <- rownames(tmp_table)
-      tmp_table <- tmp_table[c("Barcode","UMAP_1","UMAP_2")]
-      rownames(tmp_table) <- NULL
-      tmp_table$Barcode <- gsub(paste0("^",samples[idx],"_"),"",tmp_table$Barcode)
-      tmp_table$Barcode <- gsub("-1",paste0("-",idx),tmp_table$Barcode)
-      tmp_table$LibraryID <- samples[idx]
-      
-      coordinate_fixed <- rbind(coordinate_fixed,tmp_table)
-   }
-   
-   coordinate_fixed$Barcode_loupe <- paste0(paste0(coordinate_fixed$LibraryID,"_",coordinate_fixed$Barcode))
-   coordinate_fixed$Barcode_loupe <- sub("-2$","-1",coordinate_fixed$Barcode_loupe)
-   coordinate_fixed$Barcode_loupe <- sub("-3$","-1",coordinate_fixed$Barcode_loupe)
-   coordinate_fixed$Barcode_loupe <- sub("-4$","-1",coordinate_fixed$Barcode_loupe)
-   
-   # Metadata file
-   coordinate_metadata <- data.frame(Barcode = coordinate_fixed$Barcode,
-                                     LibraryID = coordinate_fixed$LibraryID,
-                                     Barcode_loupe = paste0(coordinate_fixed$LibraryID,"_",coordinate_fixed$Barcode))
-   
-   # Add columns from seurat@meta.data
-   coordinate_metadata <- cbind(coordinate_metadata, srtObject@meta.data[,meta_cols])
-   rownames(coordinate_metadata) <- NULL
-   coordinate_metadata$Barcode_loupe <- sub("-2$","-1",coordinate_metadata$Barcode_loupe)
-   coordinate_metadata$Barcode_loupe <- sub("-3$","-1",coordinate_metadata$Barcode_loupe)
-   coordinate_metadata$Barcode_loupe <- sub("-4$","-1",coordinate_metadata$Barcode_loupe)
-   
-   # Select only barcodes in cellranger
-   cellranger_cells$Barcode_loupe <- paste0(cellranger_cells$LibraryID,"_",cellranger_cells$Barcode)
-   cellranger_cells$Barcode_loupe <- sub("-2$","-1",cellranger_cells$Barcode_loupe)
-   cellranger_cells$Barcode_loupe <- sub("-3$","-1",cellranger_cells$Barcode_loupe)
-   cellranger_cells$Barcode_loupe <- sub("-4$","-1",cellranger_cells$Barcode_loupe)
-   
-   coordinate_fixed <- coordinate_fixed[which(coordinate_fixed$Barcode_loupe %in% cellranger_cells$Barcode_loupe),]
-   coordinate_metadata <- coordinate_metadata[which(coordinate_metadata$Barcode_loupe %in% cellranger_cells$Barcode_loupe),]
-   
-   if(nrow(cellranger_cells) < nrow(coordinate_fixed)){
-      message("Error: The Seurat object has more cells than the loupe file. Exit.")
-      
-   } else {
-      # Save both files
-      write.csv(coordinate_fixed,paste0(outDIR,"/loupe_coordinates_umap.csv"),row.names = FALSE)
-      write.csv(coordinate_metadata,paste0(outDIR,"/loupe_coordinates_metadata.csv"),row.names = FALSE)
-      
-   }
+   # umapCoordinates <- as.data.frame(Embeddings(object = srtObject, reduction = "umap"))
+   # samples <- unique(srtObject@meta.data$SampleID)
+   # 
+   # coordinate_fixed <- data.frame()
+   # for(idx in 1:length(samples)){
+   #    
+   #    tmp_table <- umapCoordinates[grep(samples[idx],rownames(umapCoordinates)),]
+   #    tmp_table$Barcode <- rownames(tmp_table)
+   #    tmp_table <- tmp_table[c("Barcode","umaprpca_1","umaprpca_2")]
+   #    rownames(tmp_table) <- NULL
+   #    tmp_table$Barcode <- gsub(paste0("^",samples[idx],"_"),"",tmp_table$Barcode)
+   #    tmp_table$Barcode <- gsub("-1",paste0("-",idx),tmp_table$Barcode)
+   #    tmp_table$LibraryID <- samples[idx]
+   #    
+   #    coordinate_fixed <- rbind(coordinate_fixed,tmp_table)
+   # }
+   # 
+   # coordinate_fixed$Barcode_loupe <- paste0(paste0(coordinate_fixed$LibraryID,"_",coordinate_fixed$Barcode))
+   # coordinate_fixed$Barcode_loupe <- sub("-2$","-1",coordinate_fixed$Barcode_loupe)
+   # # Metadata file
+   # coordinate_metadata <- data.frame(Barcode = coordinate_fixed$Barcode,
+   #                                   LibraryID = coordinate_fixed$LibraryID,
+   #                                   Barcode_loupe = coordinate_fixed$Barcode_loupe)
+   # 
+   # # Add columns from seurat@meta.data
+   # coordinate_metadata <- cbind(coordinate_metadata, srtObject@meta.data[,meta_cols])
+   # rownames(coordinate_metadata) <- NULL
+   # 
+   # # Select only barcodes in cellranger
+   # cellranger_cells$Barcode_loupe <- paste0(cellranger_cells$LibraryID,"_",cellranger_cells$Barcode)
+   # cellranger_cells$Barcode_loupe <- sub("-2$","-1",cellranger_cells$Barcode_loupe)
+   # 
+   # coordinate_fixed <- coordinate_fixed[which(coordinate_fixed$Barcode_loupe %in% cellranger_cells$Barcode_loupe),]
+   # coordinate_metadata <- coordinate_metadata[which(coordinate_metadata$Barcode_loupe %in% cellranger_cells$Barcode_loupe),]
+   # 
+   # if(nrow(cellranger_cells) < nrow(coordinate_fixed)){
+   #    message("Error: The Seurat object has more cells than the loupe file. Exit.")
+   #    
+   # } else {
+   #    # Save both files
+   #    write.csv(coordinate_fixed,paste0(outDIR,"/loupe_coordinates_umap.csv"),row.names = FALSE)
+   #    write.csv(coordinate_metadata,paste0(outDIR,"/loupe_coordinates_metadata.csv"),row.names = FALSE)
+   #    
+   # }
    
 }
 
