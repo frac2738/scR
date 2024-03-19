@@ -608,7 +608,7 @@ transfer_annotation <- function(referece_obj, query_obj, pipeline, annotation_co
 #' \dontrun{get_loupe_files()}
 get_loupe_files <- function(srtObject,cellranger_cells,meta_cols, outDIR = NULL){
    
-   message("[Function deprecated] Please use the official library from 10: loupeR")
+   message("[Function deprecated] Please use the official library from 10x: loupeR")
    
    # v.1.0
    # srtObject = Seurat object.size
