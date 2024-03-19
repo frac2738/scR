@@ -494,13 +494,13 @@ load_10x_gem <- function(rawDIR, source = "raw", source_type="dir", input_matrix
 #' sample_rds <- run_doubletFinder(sample_rds)
 #' }
 #' 
-run_doubletFinder <- function(srtObject, meta_column = "seurat_clusters", isSCT = FALSE, countMatrix = FALSE, seurat5 = FALSE){
+run_doubletFinder <- function(srtObject, meta_column = "seurat_clusters", isSCT = FALSE, countMatrix = FALSE, seurat5 = FALSE, cpus = 6){
    
    library(DoubletFinder)
    
    if(countMatrix){
       #options(Seurat.object.assay.version = "v3")
-      tmp_data <- CreateSeuratObject(counts = srtObject, project = "doublet_detection", min.cells=3, min.features = 100)
+      tmp_data <- CreateSeuratObject(counts = srtObject, project = "doublet_detection", min.cells=3, min.features = 50)
       tmp_data <- NormalizeData(tmp_data)
       tmp_data <- FindVariableFeatures(tmp_data, selection.method = "vst", nfeatures = 3000)
       tmp_data <- ScaleData(tmp_data)
@@ -513,7 +513,7 @@ run_doubletFinder <- function(srtObject, meta_column = "seurat_clusters", isSCT 
       tmp_data <- srtObject
    }
    
-   sweep.res.list <- paramSweep(tmp_data, PCs = 1:30, sct = isSCT)
+   sweep.res.list <- paramSweep(tmp_data, PCs = 1:30, sct = isSCT, num.cores = cpus)
    sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)
    bcmvn <- find.pK(sweep.stats)
    
