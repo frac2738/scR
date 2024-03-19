@@ -69,7 +69,10 @@ run_qc_and_filtering <- function(exp_meta,sample_num,pipeline, minFeatures, pcDi
       
       cli_inform(message = " Setting seurat v5 to FALSE")
       options(Seurat.object.assay.version = "v5")
-      doublets <- run_doubletFinder(raw_st, meta_column = "seurat_clusters", isSCT = FALSE, countMatrix = TRUE, seurat5 = FALSE)
+      
+      isSCT <- ifelse(pipeline == "SCT",TRUE,FALSE)
+      
+      doublets <- run_doubletFinder(raw_st, meta_column = "seurat_clusters", isSCT = isSCT, countMatrix = TRUE, seurat5 = seurat5)
       colnames(doublets@meta.data)[ncol(doublets@meta.data)] <- "isDoublet"
          
       #Idents(doublets) <- "isDoublet"
@@ -79,6 +82,7 @@ run_qc_and_filtering <- function(exp_meta,sample_num,pipeline, minFeatures, pcDi
       p0 <- DimPlot(doublets, group.by = "isDoublet", order = TRUE, cols = colorini)
       ggsave(p0, filename = paste0(qc_dir,"/",sample_name,"_doublets.png"), width = 12, height = 9)
       
+      Idents(doublets) <- "isDoublet"
       doublets <- subset(doublets, idents = "Singlet", invert = FALSE)
       if(seurat5){
          raw_st <- doublets@assays$RNA@layers$counts
